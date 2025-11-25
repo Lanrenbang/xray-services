@@ -1,0 +1,65 @@
+{
+// 内置 DNS 服务器，用于按域名分流和按 IP 连接
+// 域名分流：路由配置 domainStrategy = IPIfNonMatch|IPOnDemand
+// IP 连接：freedom|sockopt 的 domainStrategy = UseIP
+// 只支持最基本的 IP 查询（A 和 AAAA 记录），CNAME 记录将会重复查询直至返回 A/AAAA 记录为止，其他查询不会进入内置 DNS 服务器
+
+  "dns": {
+    "clientIp": "${XRAY_DNS_CLIENTIP_CLI}",
+    "tag": "dns_inbound",
+    
+    "hosts": {
+      // 25.7.26 添加，支持返回 RCode
+      // https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6
+      "geosite:category-ads-all": "#3"
+    },
+    "servers": [
+      {
+        "address": "https://freedns.controld.com/p2",
+        "domains": [
+          "geosite:geolocation-!cn",
+          "geosite:tld-!cn"
+        ],
+        "queryStrategy": "UseIPv4"
+      },
+      {
+        "address": "https://dns11.quad9.net/dns-query",
+        "domains": [
+          "geosite:geolocation-!cn",
+          "geosite:tld-!cn"
+        ],
+        "queryStrategy": "UseIPv4"
+      },
+      {
+        "address": "https://base.dns.mullvad.net/dns-query",
+        "domains": [
+          "geosite:geolocation-!cn",
+          "geosite:tld-!cn"
+        ],
+        "queryStrategy": "UseIPv4"
+      },
+      {
+        "address": "https://dns.alidns.com/dns-query",
+        "domains": [
+          "geosite:cn"
+        ],
+        "queryStrategy": "UseIPv4"
+      },
+      {
+        "address": "https://doh.pub/dns-query",
+        "domains": [
+          "geosite:cn"
+        ],
+        "queryStrategy": "UseIPv4"
+      },
+      {
+        "address": "https://dns.twnic.tw/dns-query",
+        "domains": [
+          "geosite:cn"
+        ],
+        "queryStrategy": "UseIPv4"
+      }
+    ]
+    
+  }
+}

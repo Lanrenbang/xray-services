@@ -1,0 +1,86 @@
+{
+// 入站代理，用于接收发来的数据
+
+  "inbounds": [  // vless+raw+reality，由 caddy-l4 反代；
+    {
+      "tag": "in_raw_reality",
+      "listen": "${XRAY_INBOUND_LISTEN_RAW_REALITY_SINGLE},0666",  // 监听套接字
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "${XRAY_USERS_UUID_RAW1}",
+            "email": "${XRAY_USERS_EMAIL_RAW1}",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "${XRAY_USERS_UUID_RAW2}",
+            "email": "${XRAY_USERS_EMAIL_RAW2}",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "${XRAY_USERS_UUID_RAW3}",
+            "email": "${XRAY_USERS_EMAIL_RAW3}",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "${XRAY_USERS_UUID_RAW4}",
+            "email": "${XRAY_USERS_EMAIL_RAW4}",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "${XRAY_INBOUND_VLESS_DECRYPTION_RAW}"
+        // vless 加密入站不能同时使用 fallbacks，且 fallbacks 只有基于 http/1.1 的 websocket 和 httpupgrade 才能从首包中读出 path，其他传输层（比如 grpc、xhttp）无法读取 path
+      },
+      
+      "streamSettings": {
+        "network": "raw",
+        "security": "reality",
+        "rawSettings": {
+          "acceptProxyProtocol": true  // 从 caddy 接收 Proxy Protocol
+        },
+        "realitySettings": {
+          "show": false,
+          "target": ${XRAY_INBOUND_REALITY_TARGET},  // 非法 reality 触发，此处以 Proxy Protocol V2 回落 caddy，如果偷别人应配置正确的目标网站，优先级高于 vless.fallbacks
+          "xver": 2,
+          "serverNames": [
+            "${XRAY_SERVERNAME_RAW}",
+            "${XRAY_SERVERNAME_XHTTP}"
+          ],
+          "privateKey": "${XARY_REALITY_PRIVATEKEY}",
+          "minClientVer": "${XARY_REALITY_CLIENT_MIN}",
+          "shortIds": [
+            "${XARY_REALITY_SHORTID1}",
+            "${XARY_REALITY_SHORTID2}",
+            "${XARY_REALITY_SHORTID3}",
+            "${XARY_REALITY_SHORTID4}"
+          ]
+        },
+        "sockopt": {
+        // "acceptProxyProtocol": true,
+        "tcpFastOpen": true,  // inbounds true 表示 256，待处理的 TFO 连接请求数上限
+        "tcpcongestion": "bbr"
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        
+        /* 特殊域名访问出现问题时可通过调整以下两个选项测试
+        "domainsExcluded": [
+          "courier.push.apple.com", // iOS 推送通知
+          "Mijia Cloud" // 米家智能设备
+        ],
+        "routeOnly": true,  // 嗅探结果仅用于路由，连接仍使用 IP
+        */
+        
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    }
+
+
+  ]
+}

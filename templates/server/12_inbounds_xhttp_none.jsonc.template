@@ -1,0 +1,62 @@
+{
+// 入站代理，用于接收发来的数据
+
+  "inbounds": [
+    {
+      "tag": "in_xhttp_none",  // vless+xhttp+无加密，由 caddy 终止 TLS 后反代，适合 CDN；
+      "listen": "${XRAY_INBOUND_LISTEN_XHTTP_NONE_SECURITY},0666", //// listen
+      "protocol": "vless",
+      "settings": {
+        "clients": [ // xhttp 传输不可以使用 flow
+          {
+            "id": "${XRAY_USERS_UUID_XHTTP1}",
+            "email": "${XRAY_USERS_EMAIL_XHTTP1}"
+          },
+          {
+            "id": "${XRAY_USERS_UUID_XHTTP2}",
+            "email": "${XRAY_USERS_EMAIL_XHTTP2}"
+          },
+          {
+            "id": "${XRAY_USERS_UUID_XHTTP3}",
+            "email": "${XRAY_USERS_EMAIL_XHTTP3}"
+          },
+          {
+            "id": "${XRAY_USERS_UUID_XHTTP4}",
+            "email": "${XRAY_USERS_EMAIL_XHTTP4}"
+          }
+        ],
+        "decryption": "${XRAY_INBOUND_VLESS_DECRYPTION_XHTTP}"
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "xhttpSettings": {
+          "path": "${XRAY_XHTTP_PATH}"
+        },
+        "sockopt": {
+          "acceptProxyProtocol": true,
+          "tcpFastOpen": true,  // inbounds true 表示 256，待处理的 TFO 连接请求数上限
+          "tcpcongestion": "bbr"
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        
+        /* 特殊域名访问出现问题时可通过调整以下两个选项测试
+        "domainsExcluded": [
+          "courier.push.apple.com", // iOS 推送通知
+          "Mijia Cloud" // 米家智能设备
+        ],
+        "routeOnly": true,  // 嗅探结果仅用于路由，连接仍使用 IP
+        */
+        
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    }
+
+
+  ]
+}

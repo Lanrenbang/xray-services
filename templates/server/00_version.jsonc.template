@@ -1,0 +1,29 @@
+/*
+  - 25.6.8 有严重漏洞修复
+  - 25.7.26 抗量子 ML-DSA-65 签名/TLS ECH 功能
+  - 25.8.3 dokodemo-door -> tunnel | freedom -> direct | blackhole -> block，TLS ECH 增强
+  - 25.9.5 VLESS 加密，vleesRoute 路由分流，提升运行效率和资源占用
+  - 25.9.11 简化反向代理/内网穿透
+  - 25.10.15 VLESS 反向代理增强，升级 uTLS 修复 Chrome 指纹（客户端重要），http+unix://，可选简化出站配置
+
+* 出入站：
+  (srv) 10_inbounds_raw_reality - vless+raw+reality，由 caddy-l4 sni 反代；
+    (cli) 21_outbounds_raw_reality 使用；
+    ** 实际无脑 fallbacks 可以回落到 12_inbounds_xhttp_none，但如果使用 vless 加密则不能使用 fallbacks，因此本条单独编写；
+  (srv) 11_inbounds_reality_fallback - vless+raw+reality，由 caddy-l4 sni 反代，仅作为 12_inbounds_xhttp_none 跳板实现 xhttp+reality，无单独实现是为了上下行分离共用；
+    (cli) 22_outbounds_xhttp_reality、24_outbounds_xhttp_tls2reality 下行、25_outbounds_xhttp_reality2tls 上行 使用；
+  (srv) 12_inbounds_xhttp_none - vless+xhttp+无加密，由 caddy 终止 TLS 后反代，适合 CDN，或者由 11_inbounds_reality_fallback 回落实现 xhttp+reality；
+    (cli) 23_outbounds_xhttp_tls、24_outbounds_xhttp_tls2reality 上行、25_outbounds_xhttp_reality2tls 下行 使用；
+
+  ** 由于 caddy-l4 不能解析 reality 则无法取 http.path，仅通过 sni，因此 10、11 需要独立域名或者子域名，12 需要单独的 CDN 域名或子域名
+*/
+
+
+{
+// 配置文件对应的应用版本：25.8.3 以后版本才添加该顶级配置，因此低于该版本无意义
+
+  "version": {
+      "min": "${XRAY_CONFIG_VERSION_MIN}",
+      "max": "${XRAY_CONFIG_VERSION_MAX}"
+  }
+}

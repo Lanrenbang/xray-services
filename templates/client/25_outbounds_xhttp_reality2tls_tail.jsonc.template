@@ -1,0 +1,76 @@
+{
+/* 出站代理，用于发送数据，由路由策略控制
+  
+  25.9.11 取消 vless 配置嵌套（vnext），25.10.15 其他大部分出站协议取消嵌套；
+  现在配置文件严格只允许一个 outbound 只能有一个服务器端点信息，每个服务器端点信息只能有一组认证信息；
+  需要配置多个端点信息，必须使用 routing 配置中的 balancer（可以配合 observation 使用）。
+*/
+
+  "outbounds": [
+    { // xhttp + reality 上行，tls 下行，可 CDN，经由服务端回落，适合去程好、回程差的线路，偏重上传，很少下载
+      "tag": "out_xhttp_reality2tls",
+      "protocol": "vless",
+      "settings": {
+        "address": "${XRAY_OUTBOUND_ADDRESS_XHTTP}",
+        "port": ${XRAY_OUTBOUND_PORT},
+        "id": "${XRAY_USER_UUID_XHTTP}",
+        "encryption": "${XRAY_INBOUND_VLESS_ENCRYPTION_XHTTP}"
+        // xhttp 传输不可以使用 flow
+      },
+      
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "${XARY_OUTBOUND_FINGERPRINT}",
+          "serverName": "${XRAY_SERVERNAME_XHTTP}",
+          "password": "${XARY_REALITY_PASSWORD}",
+          "shortId": "${XARY_REALITY_SHORTID_CUR}",
+          "spiderX": "${XARY_REALITY_SPIDERX_CUR}"
+        },
+        "xhttpSettings": {
+          "host": "${XRAY_OUTBOUND_ADDRESS_XHTTP}", // host > serverName > address，可省略（nginx xhttp 必须），为分享设置
+          "path": "${XRAY_XHTTP_PATH}",
+          "mode": "auto", // 默认值，可省略，为分享设置
+          "extra": {
+            "downloadSettings": { // 复制 out_xhttp_tls 作为下行
+              "address": "${XRAY_OUTBOUND_ADDRESS_CDN}",
+              "port": ${XRAY_OUTBOUND_PORT},
+              "network": "xhttp",
+              "security": "tls",
+              "tlsSettings": {
+                "fingerprint": "${XARY_OUTBOUND_FINGERPRINT}",
+                "serverName": "${XRAY_OUTBOUND_ADDRESS_CDN}",
+                "alpn": [ // 是否能使用 h3 取决于 CDN 是否支持并且所在地区 UDP 的 QoS 是否严重}
+                  "h2"
+                ]
+              },
+              
+              "xhttpSettings": {
+                "host": "${XRAY_OUTBOUND_ADDRESS_CDN}", // host > serverName > address，可省略（nginx xhttp 必须），为分享设置
+                "path": "${XRAY_XHTTP_PATH}",
+                "mode": "auto" // 默认值，可省略，为分享设置
+              },
+              "sockopt": {
+                // "acceptProxyProtocol": true,
+                // "tproxy": "off",
+                "tcpFastOpen": true,
+                "tcpcongestion": "bbr",
+                "tcpMptcp": true // client only
+              }
+            }
+          }
+        },
+        "sockopt": {
+          // "acceptProxyProtocol": true,
+          // "tproxy": "off",
+          "tcpFastOpen": true,
+          "tcpcongestion": "bbr",
+          "tcpMptcp": true // client only
+        }
+      }
+      // xhttp 传输不可以使用 mux
+    }
+
+  ]
+}

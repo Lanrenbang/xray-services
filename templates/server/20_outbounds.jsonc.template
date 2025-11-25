@@ -1,0 +1,16 @@
+{
+// 出站代理，用于发送数据，由路由策略控制
+// ！！！第一条为默认出站！！！
+
+  "outbounds": [
+    { // 主 outbound
+      "protocol": "direct",  // 25.8.3 freedom 别名 direct
+      "tag": "direct"
+    },
+    {
+      "protocol": "block",  // 25.8.3 blackhole 别名 block
+      "tag": "block"
+
+    }
+  ]
+}

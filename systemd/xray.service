@@ -1,0 +1,27 @@
+[Unit]
+Description=Xray Service
+Documentation=https://github.com/xtls
+After=network.target nss-lookup.target
+
+[Service]
+# 动态用户 UID/GID 61184…65519
+DynamicUser=true
+# 配置目录，固定 /etc/xray
+ConfigurationDirectory=xray
+# 日志目录，如果 xray 配置里开启日志，必须指定为 /var/log/xray
+LogsDirectory=xray
+# 地理数据目录，如果使用 geo-update 定时更新，路径需保持一致
+Environment=XRAY_LOCATION_ASSET=/usr/share/v2ray
+
+ExecStart=/usr/local/bin/xray run -confdir $CONFIGURATION_DIRECTORY
+
+# 动态用户默认启用
+# NoNewPrivileges=true
+
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+LimitNOFILE=524288
+Restart=on-failure
+RestartPreventExitStatus=23
+
+[Install]
+WantedBy=multi-user.target

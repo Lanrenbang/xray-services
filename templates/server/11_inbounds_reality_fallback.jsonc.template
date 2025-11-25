@@ -1,0 +1,69 @@
+{
+// 入站代理，用于接收发来的数据
+// 仅用于回落到 xhttp，解决 `vless 回落/加密 不能共存且客户端要实现 xhttp reality/tls 出站共存`；
+
+  "inbounds": [  // vless+raw+reality，由 caddy-l4 反代，仅作为 xhttp+reality 跳板；
+    {
+      "tag": "in_reality_fallback",
+      "listen": "${XRAY_INBOUND_LISTEN_RAW_REALITY_FALLBACK},0666",  // 监听套接字
+      "protocol": "vless",
+      "settings": {
+        // "clients": [],  // 本入站仅作回落，不必配置客户
+        "decryption": "none",  // fallbacks 时不可 vless 加密，且 fallbacks 只有基于 http/1.1 的 websocket 和 httpupgrade 才能从首包中读出 path，其他传输层（比如 grpc、xhttp）无法读取 path
+        "fallbacks": [{  // 优先级低于 reality.target；能到达这里，必须是合法 reality，然后是`非法 vless` 或者 `合法 vless 但非法 network(raw)` 触发，因此可实现 xhttp+reality 的回落；
+          "dest": "${XRAY_INBOUND_LISTEN_XHTTP_NONE_SECURITY}", // 回落给 xhttp
+          "xver": 1
+        }]
+      },
+      
+      "streamSettings": {
+        "network": "raw",
+        "security": "reality",
+        "rawSettings": {
+          "acceptProxyProtocol": true  // 从 caddy 接收 Proxy Protocol
+        },
+        "realitySettings": {
+          "show": false,
+          "target": ${XRAY_INBOUND_REALITY_TARGET},  // 非法 reality 触发，此处以 Proxy Protocol V2 回落 caddy，如果偷别人应配置正确的目标网站，优先级高于 vless.fallbacks
+          "xver": 2,
+          "serverNames": [
+            "${XRAY_SERVERNAME_RAW}",
+            "${XRAY_SERVERNAME_XHTTP}"
+          ],
+          "privateKey": "${XARY_REALITY_PRIVATEKEY}",
+          "minClientVer": "${XARY_REALITY_CLIENT_MIN}",
+          "shortIds": [
+            "${XARY_REALITY_SHORTID1}",
+            "${XARY_REALITY_SHORTID2}",
+            "${XARY_REALITY_SHORTID3}",
+            "${XARY_REALITY_SHORTID4}"
+          ]
+        },
+        "sockopt": {
+        // "acceptProxyProtocol": true,
+        "tcpFastOpen": true,  // inbounds true 表示 256，待处理的 TFO 连接请求数上限
+        "tcpcongestion": "bbr"
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        
+        /* 特殊域名访问出现问题时可通过调整以下两个选项测试
+        "domainsExcluded": [
+          "courier.push.apple.com", // iOS 推送通知
+          "Mijia Cloud" // 米家智能设备
+        ],
+        "routeOnly": true,  // 嗅探结果仅用于路由，连接仍使用 IP
+        */
+        
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    }
+
+
+  ]
+}

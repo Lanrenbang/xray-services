@@ -1,0 +1,28 @@
+{
+// 流量数据的统计，存在空对象即可。
+
+  "stats": {},
+
+// 本地策略，开启流量统计
+  "policy": {
+    "levels": {
+      "0": {
+        // "handshake": 4,  // 连接建立时的握手时间限制，单位为秒，默认值为 4
+        // "connIdle": 300,  // 连接空闲的时间限制，单位为秒，默认值为 300
+        // "uplinkOnly": 2,  // 当连接下行线路关闭后的时间限制，单位为秒，默认值为 2
+        // "downlinkOnly": 5,  // 当连接上行线路关闭后的时间限制，单位为秒，默认值为 5
+        // "bufferSize": 4,  // 每个请求的内部缓存大小，单位为 KB
+        "statsUserUplink": true,  // 开启当前等级的所有用户的上行流量统计，默认 false
+        "statsUserDownlink": true,  // 开启当前等级的所有用户的下行流量统计，默认 false
+        "statsUserOnline": true  // 开启当前等级的所有用户的在线(在线标准：20秒内有过连接活动)数量统计，默认 false
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,  // 开启所有入站代理的上行流量统计，默认 false
+      "statsInboundDownlink": true,  // 开启所有入站代理的下行流量统计，默认 false
+      "statsOutboundUplink": true,  // 开启所有出站代理的上行流量统计，默认 false
+      "statsOutboundDownlink": true  // 开启所有出站代理的下行流量统计，默认 false
+    }
+  }
+
+}

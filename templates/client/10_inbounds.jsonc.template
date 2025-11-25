@@ -1,0 +1,57 @@
+{
+// 入站代理，用于接收发来的数据
+
+  "inbounds": [
+    {
+      "tag": "in_socks",  // 多配置场景下必须设置，否则会覆盖
+      "port": ${XRAY_INBOUND_PORT_SOCK}, // 本地 SOCKS 代理端口
+      "protocol": "socks",
+      "settings": {
+        "udp": true
+      },
+      "sniffing": {
+        "enabled": true,
+        
+        /* 特殊域名访问出现问题时可通过调整以下两个选项测试
+        "domainsExcluded": [
+          "courier.push.apple.com", // iOS 推送通知
+          "Mijia Cloud" // 米家智能设备
+        ],
+        "routeOnly": true,  // 嗅探结果仅用于路由，连接仍使用 IP
+        */
+        
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+        
+      }
+    },
+// ---------------------------------------------------------------------------------------------
+    {
+      "tag": "in_http",  // 多配置场景下必须设置，否则会覆盖
+      "port": ${XRAY_INBOUND_PORT_HTTP}, // 本地 HTTP 代理端口
+      "protocol": "http",
+      "sniffing": {
+        "enabled": true,
+        
+        /* 特殊域名访问出现问题时可通过调整以下两个选项测试
+        "domainsExcluded": [
+          "courier.push.apple.com", // iOS 推送通知
+          "Mijia Cloud" // 米家智能设备
+        ],
+        "routeOnly": true,  // 嗅探结果仅用于路由，连接仍使用 IP
+        */
+        
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    }
+
+
+  ]
+}

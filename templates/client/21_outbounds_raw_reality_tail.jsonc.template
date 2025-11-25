@@ -1,0 +1,48 @@
+{
+/* 出站代理，用于发送数据，由路由策略控制
+
+  25.9.11 取消 vless 配置嵌套（vnext），25.10.15 其他大部分出站协议取消嵌套；
+  现在配置文件严格只允许一个 outbound 只能有一个服务器端点信息，每个服务器端点信息只能有一组认证信息；
+  需要配置多个端点信息，必须使用 routing 配置中的 balancer（可以配合 observation 使用）。
+*/
+
+  "outbounds": [
+    { // raw + reality，尽可能低的延迟与尽可能高的上下行速度
+      "tag": "out_raw_reality",
+      "protocol": "vless",
+      "settings": {
+        "address": "${XRAY_OUTBOUND_ADDRESS_RAW}",
+        "port": ${XRAY_OUTBOUND_PORT},
+        "id": "${XRAY_USER_UUID_RAW}",
+        "encryption": "${XRAY_INBOUND_VLESS_ENCRYPTION_RAW}",
+        "flow": "xtls-rprx-vision"
+      },
+      
+      "streamSettings": {
+        "network": "raw",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "${XARY_OUTBOUND_FINGERPRINT}",
+          "serverName": "${XRAY_SERVERNAME_RAW}",
+          "password": "${XARY_REALITY_PASSWORD}",
+          "shortId": "${XARY_REALITY_SHORTID_CUR}",
+          "spiderX": "${XARY_REALITY_SPIDERX_CUR}"
+        },
+        "sockopt": {
+          // "acceptProxyProtocol": true,
+          // "tproxy": "off",
+          "tcpFastOpen": true,
+          "tcpcongestion": "bbr",
+          "tcpMptcp": true // client only
+        }
+      },
+      "mux": {
+        "enabled": true,
+        "concurrency": -1, // 不承载 TCP 流量
+        "xudpConcurrency": 16,
+        "xudpProxyUDP443": "reject"
+      }
+    }
+
+  ]
+}

@@ -1,0 +1,25 @@
+{
+// 突发连接观测，使用 HTTPing 的方式探测出站代理的连接状态。观测结果可以被其他组件使用，如负载均衡器
+/* 针对以下 outbounds
+"outboundTag": "out_raw_reality"
+"outboundTag": "out_xhttp_reality"
+"outboundTag": "out_xhttp_tls"
+"outboundTag": "out_xhttp_tls2reality"
+"outboundTag": "out_xhttp_reality2tls"
+*/
+
+  "burstObservatory": {
+    "subjectSelector": ["out_"],  // 前缀
+    "pingConfig": {
+      //"destination": "https://connectivitycheck.gstatic.com/generate_204",
+      //"destination": "https://www.gstatic.com/generate_204",
+      "destination": "https://cp.cloudflare.com/generate_204",
+      
+      "connectivity": "http://connectivitycheck.platform.hicloud.com/generate_204",
+      "interval": "5m",  // interval * sampling 间隔探测一轮
+      "sampling": 2,
+      "timeout": "30s"
+    }
+  }
+
+}

@@ -1,0 +1,77 @@
+{
+// 路由配置，将入站数据按不同规则由不同的出站连接发出，实现按需代理
+/* 可用 outbounds
+"outboundTag": "direct"
+"outboundTag": "block"
+"outboundTag": "out_raw_reality"
+"outboundTag": "out_xhttp_reality"
+"outboundTag": "out_xhttp_tls"
+"outboundTag": "out_xhttp_tls2reality"
+"outboundTag": "out_xhttp_reality2tls"
+*/
+
+
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",   // 域名未匹配则解析为 IP 再次进行 IP 路由规则匹配
+    "rules": [
+      { // 海外 DNS 服务器代理，国内直连
+        "domain": [
+          "freedns.controld.com",
+          "dns11.quad9.net",
+          "base.dns.mullvad.net"
+        ],
+        // "outboundTag": "out_xhttp_reality"
+        "balancerTag": "balancer"  // 启用负载均衡器
+      },
+      {
+        "inboundTag": [
+          "dns_inbound"
+        ],
+        "outboundTag": "direct"
+      },
+      { // 广告屏蔽
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
+      },
+      { // 突发连接观测流量直连
+        "domain": [
+          "connectivitycheck.gstatic.com",
+          "cp.cloudflare.com"
+        ],
+        "outboundTag": "direct"
+      },
+      { // 国内/内网流量一律直连
+        "domain": [
+          "geosite:cn",
+          "geosite:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "ip": [
+          "geoip:cn",
+          "geoip:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "network": "tcp,udp", // 强制兜底规则，默认前面不匹配时自动走第一条出站，这里强制指定，后续不再有其他流量
+        // "outboundTag": "out_xhttp_reality"
+        "balancerTag": "balancer"  // 启用负载均衡器
+      }
+    ],
+    "balancers": [  // 负载均衡器
+      {
+        "tag": "balancer",
+        "selector": ["out_"],  // 前缀
+        "fallbackTag": "out_xhttp_reality",  // 连接观测全部失败的回退出站，必须配置 observatory 或者 burstObservatory
+        "strategy": {
+          "type": "leastPing"   // 根据连接观测结果选择延迟最小的出站代理
+        }
+      }
+    ]
+
+  }
+}

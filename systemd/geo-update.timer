@@ -1,0 +1,18 @@
+# /etc/systemd/system/geo-update.timer
+[Unit]
+Description=Daily Geographic Data Update
+Documentation=https://github.com/Lanrenbang/xray-services
+Requires=geo-update.service
+
+[Timer]
+# 地理数据库北京时间 6 点更新，这里设置 UTC 相当于每天 8 点拉取
+OnCalendar=*-*-* 00:00:00 UTC
+
+# 如果错过执行时间（如关机），开机后立即执行
+Persistent=true
+
+# 随机延迟 0-30 分钟，避免集中负载
+RandomizedDelaySec=30min
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,43 @@
+{
+// 路由配置，将入站数据按不同规则由不同的出站连接发出，实现按需代理
+
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",   // 域名未匹配则解析为 IP 再次进行 IP 路由规则匹配
+    "rules": [
+      { // 海外 DNS 服务器直连，国内屏蔽
+        "domain": [
+          "dns.alidns.com",
+          "doh.pub",
+          "dns.twnic.tw"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "inboundTag": [
+          "dns_inbound"
+        ],
+        "outboundTag": "direct"
+      },
+      { // 广告屏蔽
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
+      },
+      { // 国内/内网流量一律禁止
+        "domain": [
+          "geosite:cn",
+          "geosite:private"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "ip": [
+          "geoip:cn",
+          "geoip:private"
+        ],
+        "outboundTag": "block"
+      } // 其余流量 -> 主 outbound
+    ]
+  }
+}

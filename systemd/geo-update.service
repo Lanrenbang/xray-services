@@ -1,0 +1,32 @@
+# /etc/systemd/system/geo-update.service
+[Unit]
+Description=Update Geographic Data
+Documentation=https://github.com/Lanrenbang/xray-services
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# 用户要根据实际场景定义
+# xray 作为本地服务时应为 root 才能重启服务
+# 如果是 xray 容器，则应是具备该容器重启权限用户
+User=root
+
+# 注意提前安装脚本到指定位置
+# --target - xray 地理数据目录，如果使用官方默认值，应该为 /usr/share/xray
+# --command - 地理数据更新后要启动的命令
+ExecStart=/usr/local/bin/geo-update.sh \
+  --target /usr/share/v2ray \
+  --command "systemctl try-restart xray.service"
+
+# === 安全沙盒 ===
+# 该目录必须是上面的 --target
+ReadWritePaths=/usr/share/v2ray
+BindReadOnlyPaths=/run/dbus/system_bus_socket
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+CapabilityBoundingSet=
+NoNewPrivileges=yes
+

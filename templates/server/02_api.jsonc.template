@@ -1,0 +1,14 @@
+{
+// API 接口配置，基于 gRPC 的 API 接口
+
+  "api": {
+    "tag": "api",
+    "listen": "127.0.0.1:8080",
+    "services": [
+      "HandlerService",
+      "LoggerService",
+      "StatsService",
+      "RoutingService"
+    ]
+  }
+}

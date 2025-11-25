@@ -1,0 +1,12 @@
+{
+// 日志配置，控制 Xray 输出日志的方式
+
+  "log": {
+    // "access": "/var/log/xray/access.log", // 不指定则输出到 stdout
+    // "error": "/var/log/xray/error.log",
+    // "loglevel": "debug",  // "debug" | "info" | "warning"（默认） | "error" | "none"
+    // "maskAddress": "quarter"  // "quarter" | "half" | "full"
+    "dnsLog": true
+
+  }
+}
