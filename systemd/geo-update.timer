@@ -2,7 +2,6 @@
 [Unit]
 Description=Daily Geographic Data Update
 Documentation=https://github.com/Lanrenbang/xray-services
-Requires=geo-update.service
 
 [Timer]
 # 地理数据库北京时间 6 点更新，这里设置 UTC 相当于每天 8 点拉取

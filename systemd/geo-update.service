@@ -7,7 +7,6 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-RemainAfterExit=yes
 # 用户要根据实际场景定义
 # xray 作为本地服务时应为 root 才能重启服务
 # 如果是 xray 容器，则应是具备该容器重启权限用户
