@@ -1,5 +1,6 @@
 # xray-services
-[English](README.md) | [Simplified Chinese](README-cn.md)
+
+[English](README.md) | [简体中文](README-cn.md)
 
 Use Xray-core in a secure and simple way. Your configuration files can be shared freely without redaction. With secrets support, even your environment variable configurations can be shared safely.
 
