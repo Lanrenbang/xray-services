@@ -8,14 +8,17 @@ on:
       - 'Dockerfile'
       - '.github/workflows/docker-build.yml'
 
-  release:
-    types: [published]
+#  release:
+#    types: [published]
 
   workflow_dispatch:
     inputs:
       image_tag:
         description: 'Manual image tag to build and push'
         required: true
+
+  repository_dispatch:
+    types: [release-auto]
 
 permissions: read-all
 
@@ -67,14 +70,20 @@ jobs:
           flavor: |
             latest=false
           tags: |
+            # Push 事件 (main 分支)
             type=sha,format=long,enable=${{ github.event_name == 'push' }}
-            type=raw,value=latest,enable=${{ github.event_name == 'push' || github.event_name == 'release' }}
-            type=semver,pattern={{version}},enable=${{ github.event_name == 'release' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'push' }}
+            
+            # Dispatch 事件 (自动发布)
+            type=raw,value=${{ github.event.client_payload.tag_name }},enable=${{ github.event_name == 'repository_dispatch' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'repository_dispatch' && github.event.client_payload.mode == 'upstream' }}
+            
+            # 手动触发
             type=raw,value=${{ inputs.image_tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
 
       - name: Build and push image (on push or manual trigger)
         # 仅在非 release 事件时运行
-        if: github.event_name != 'release'
+        if: github.event_name == 'push' || (github.event_name == 'repository_dispatch' && github.event.client_payload.mode == 'upstream')
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83  # v6.18.0
         with:
           context: .
@@ -93,7 +102,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Docker Hub Description
-        if: github.event_name != 'release'
+        if: github.event_name == 'push' || (github.event_name == 'repository_dispatch' && github.event.client_payload.mode == 'upstream')
         uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa  # V5.0.0
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
@@ -102,23 +111,24 @@ jobs:
           short-description: ${{ github.event.repository.description }}
 
       - name: Re-tag for Release
-        if: github.event_name == 'release'
+        if: github.event_name == 'repository_dispatch' && github.event.client_payload.mode == 'manual'
         run: |
           GHCR_LOWER="${GHCR_IMAGE,,}"
           DOCKERHUB_LOWER="${DOCKERHUB_IMAGE,,}"
           
           # 直接使用 GHCR 的 latest
           SOURCE_IMAGE="$GHCR_LOWER:latest"
+          TAG_NAME="${{ github.event.client_payload.tag_name }}"
           
           echo "Source Image found: $SOURCE_IMAGE"
-          echo "Target Tags: ${{ github.event.release.tag_name }}"
+          echo "Target Tags: $TAG_NAME"
 
           # 执行跨仓库/跨标签同步
           docker buildx imagetools create \
             "$SOURCE_IMAGE" \
-            --tag "$GHCR_LOWER:${{ github.event.release.tag_name }}" \
-            --tag "$DOCKERHUB_LOWER:${{ github.event.release.tag_name }}" \
+            --tag "$GHCR_LOWER:$TAG_NAME" \
+            --tag "$DOCKERHUB_LOWER:$TAG_NAME" \
             --tag "$DOCKERHUB_LOWER:latest"
 
-          echo "Successfully promoted $SOURCE_IMAGE to release ${{ github.event.release.tag_name }}"
+          echo "Successfully promoted $SOURCE_IMAGE to release $TAG_NAME"
 

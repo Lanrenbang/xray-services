@@ -1,5 +1,6 @@
 # xray-services
-[英文](README.md) | [简体中文](README-cn.md)
+
+[English](README.md) | [简体中文](README-cn.md)
 
 以安全/简单的方式使用 Xray-core；你的配置文件无需任何隐藏处理即可随意分享，甚至使用机密支持后，你的环境变量配置也可随意分享。
 
