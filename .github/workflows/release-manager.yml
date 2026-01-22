@@ -97,16 +97,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Dispatch to Docker Build'
-              if: steps.params.outputs.publish == 'true'
-              uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697  # v4.0.1
-              with:
-                token: ${{ secrets.BOT_PAT }}
-                event-type: release-auto
-                client-payload: |
-                  {
-                    "tag_name": "${{ steps.drafter.outputs.tag_name }}",
-                    "mode": "${{ steps.params.outputs.event_mode }}"
-                  }
+        if: steps.params.outputs.publish == 'true'
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697  # v4.0.1
+        with:
+          token: ${{ secrets.BOT_PAT }}
+          event-type: release-auto
+          client-payload: |
+            {
+              "tag_name": "${{ steps.drafter.outputs.tag_name }}",
+              "mode": "${{ steps.params.outputs.event_mode }}"
+            }
 
 
 
