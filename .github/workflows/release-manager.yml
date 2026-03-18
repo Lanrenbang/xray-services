@@ -1,11 +1,10 @@
-# .github/workflows/release-manager.yml
 name: '🚀 Release Manager'
 
 on:
   push:
     branches:
       - main
-  pull_request: # for autolabeler
+  pull_request:
     types:
       - opened
       - reopened
@@ -31,82 +30,16 @@ permissions:
   contents: read
 
 jobs:
-  draft-or-publish:
+  release:
+    uses: Lanrenbang/.github/.github/workflows/reusable-release-manager.yml@main
     permissions:
       contents: write
-      pull-requests: write  # write for autolabeler, otherwise read
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Determine release parameters'
-        id: params
-        shell: bash
-        run: |
-          PUBLISH=false
-          EVENT_MODE="manual"
-          PRERELEASE=false
-          PRERELEASE_ID=""
-          
-          echo "📋 Event: ${{ github.event_name }}"
-          
-          case "${{ github.event_name }}" in
-            workflow_dispatch)
-              if [[ "${{ inputs.publish }}" == "true" ]]; then
-                PUBLISH=true
-                echo "   ✓ Will publish release"
-                
-                if [[ -n "${{ inputs.prerelease-identifier }}" ]]; then
-                  PRERELEASE=true
-                  PRERELEASE_ID="${{ inputs.prerelease-identifier }}"
-                  echo "   ✓ Prerelease: $PRERELEASE_ID"
-                fi
-              fi
-              ;;
-            
-            repository_dispatch)
-              TRIGGERED_BY="${{ github.event.client_payload.triggered_by }}"
-              echo "   Repository dispatch from: $TRIGGERED_BY"
-              if [[ "$TRIGGERED_BY" == "upstream-watcher" ]]; then
-                PUBLISH=true
-                EVENT_MODE="upstream"
-                echo "   ✓ Upstream update detected, will publish release"
-              fi
-              ;;
-            *)
-              echo "   Standard event, updating draft only"
-              ;;
-          esac
-          
-          {
-            echo "publish=$PUBLISH"
-            echo "event_mode=$EVENT_MODE"
-            echo "prerelease=$PRERELEASE"
-            echo "prerelease_id=$PRERELEASE_ID"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: 'Run Release Draft'
-        id: drafter
-        uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5  # v6.1.0
-        with:
-          # https://github.com/release-drafter/release-drafter/issues/1125
-          commitish: ${{ github.event.repository.default_branch }}
-          publish: ${{ steps.params.outputs.publish }}
-          prerelease: ${{ steps.params.outputs.prerelease }}
-          prerelease-identifier: ${{ steps.params.outputs.prerelease_id }}
-        env:
-          # GITHUB_TOKEN cannot trigger a new workflow.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 'Dispatch to Docker Build'
-        if: steps.params.outputs.publish == 'true'
-        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697  # v4.0.1
-        with:
-          token: ${{ secrets.BOT_PAT }}
-          event-type: release-auto
-          client-payload: |
-            {
-              "tag_name": "${{ steps.drafter.outputs.tag_name }}",
-              "mode": "${{ steps.params.outputs.event_mode }}"
-            }
-
-
-
+      pull-requests: write
+    with:
+      has_docker: true
+      publish: ${{ github.event_name == 'workflow_dispatch' && inputs.publish || false }}
+      prerelease_identifier: ${{ github.event_name == 'workflow_dispatch' && inputs.prerelease-identifier || '' }}
+      event_name: ${{ github.event_name }}
+      triggered_by: ${{ github.event.client_payload.triggered_by || '' }}
+    secrets:
+      bot_pat: ${{ secrets.BOT_PAT }}
