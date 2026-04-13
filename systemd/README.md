@@ -53,8 +53,8 @@ ENVWARP_CONFDIR="${RUNTIME_DIRECTORY}"
 ENVWARP_EXECUTION=""
 #
 # 修改默认为容器设置的机密路径，比如：
-# XARY_REALITY_PRIVATEKEY="file./run/secrets/<secret_name>" # <- 这是默认设置
-XARY_REALITY_PRIVATEKEY="file.${CREDENTIALS_DIRECTORY}/<secret_name>"
+# XRAY_REALITY_PRIVATEKEY="file./run/secrets/<secret_name>" # <- 这是默认设置
+XRAY_REALITY_PRIVATEKEY="file.${CREDENTIALS_DIRECTORY}/<secret_name>"
 # 简单说就是将 /run/secrets 全部替换为 ${CREDENTIALS_DIRECTORY} 这个固定环境变量即可。
 #
 # 其他选项请按需配置，务必记录好需要的机密名称用于下一步。
@@ -67,7 +67,7 @@ sudo mkdir /etc/credstore.encrypted/xray
 echo -n "some_creds" | sudo systemd-creds encrypt --name=<prefix>_<cred_name>[.cred] - /etc/credstore.encrypted/<prefix>/<cred_name>[.cred]
 # 注意其中的 <prefix> 和 <cred_name> ，为了整体与容器机密统一，如 xray_reality_privateKey
 # 我们定义其 <prefix> 固定是 xray，<cred_name> 是 reality_privateKey
-# 这样做的目的是凭据加载格式是 <id>[:path]，id 是必须的，如上设置，正确加载凭据的格式就是 `xray_reality_privateKey`:/etc/credstore.encrypted/xray/reality_privateKey
+# 这样做的目的是凭据加载格式是 <id>[:path]，id 是必须的，如上设置，正确加载凭据的格式就是 `xray_reality_privateKey:/etc/credstore.encrypted/xray/reality_privateKey`
 #
 # 为了不必多个凭据在服务单元里配置多行，path 允许提供绝对目录，此时生成的凭据名称规则是 <id>_<file_name>
 # 因此如上配置后，加载 /etc/credstore.encrypted/xray/ 这个目录的全部凭据，将自动变成 xray_<cred_name>，这就能完美和 .env.warp 定义兼容

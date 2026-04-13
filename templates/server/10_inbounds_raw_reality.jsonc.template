@@ -7,26 +7,30 @@
       "listen": "${XRAY_INBOUND_LISTEN_RAW_REALITY_SINGLE},0666",  // 监听套接字
       "protocol": "vless",
       "settings": {
+        "flow": "xtls-rprx-vision",  // 25.9.5，全局 flow 设置
+        
         "clients": [
           {
-            "id": "${XRAY_USERS_UUID_RAW1}",
-            "email": "${XRAY_USERS_EMAIL_RAW1}",
-            "flow": "xtls-rprx-vision"
+            "id": "${XRAY_USERS_UUID_PC}",
+            "email": "${XRAY_USERS_EMAIL_PC}"
           },
           {
-            "id": "${XRAY_USERS_UUID_RAW2}",
-            "email": "${XRAY_USERS_EMAIL_RAW2}",
-            "flow": "xtls-rprx-vision"
+            "id": "${XRAY_USERS_UUID_IPHONE}",
+            "email": "${XRAY_USERS_EMAIL_IPHONE}"
           },
           {
-            "id": "${XRAY_USERS_UUID_RAW3}",
-            "email": "${XRAY_USERS_EMAIL_RAW3}",
-            "flow": "xtls-rprx-vision"
+            "id": "${XRAY_USERS_UUID_ANDROID}",
+            "email": "${XRAY_USERS_EMAIL_ANDROID}"
           },
           {
-            "id": "${XRAY_USERS_UUID_RAW4}",
-            "email": "${XRAY_USERS_EMAIL_RAW4}",
-            "flow": "xtls-rprx-vision"
+            "id": "${XRAY_USERS_UUID_NAS}",
+            "email": "${XRAY_USERS_EMAIL_NAS}"
+          },
+          {
+            "id": "${XRAY_USERS_UUID_REVERSE}",  // 反代
+            "reverse": {
+							"tag": "r-outbound"
+						}
           }
         ],
         "decryption": "${XRAY_INBOUND_VLESS_DECRYPTION_RAW}"
@@ -47,13 +51,13 @@
             "${XRAY_SERVERNAME_RAW}",
             "${XRAY_SERVERNAME_XHTTP}"
           ],
-          "privateKey": "${XARY_REALITY_PRIVATEKEY}",
-          "minClientVer": "${XARY_REALITY_CLIENT_MIN}",
+          "privateKey": "${XRAY_REALITY_PRIVATEKEY}",
+          "minClientVer": "${XRAY_REALITY_CLIENT_MIN}",
           "shortIds": [
-            "${XARY_REALITY_SHORTID1}",
-            "${XARY_REALITY_SHORTID2}",
-            "${XARY_REALITY_SHORTID3}",
-            "${XARY_REALITY_SHORTID4}"
+            "${XRAY_REALITY_SHORTID1}",
+            "${XRAY_REALITY_SHORTID2}",
+            "${XRAY_REALITY_SHORTID3}",
+            "${XRAY_REALITY_SHORTID4}"
           ]
         },
         "sockopt": {

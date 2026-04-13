@@ -7,17 +7,28 @@
 */
 
   "outbounds": [
+    {
+      "protocol": "direct",  // 25.8.3 freedom 别名 direct
+      "tag": "r-reverse",
+      "settings": {
+        "redirect": "127.0.0.1:8787"
+      }
+
+    },
     { // raw + reality，尽可能低的延迟与尽可能高的上下行速度
-      "tag": "out_raw_reality",
+      "tag": "reverse_out_raw_reality",
       "protocol": "vless",
       "settings": {
         "address": "${XRAY_OUTBOUND_ADDRESS_RAW}",
         "port": ${XRAY_OUTBOUND_PORT},
-        "id": "${XRAY_USER_UUID_OUTBOUND}",
+        "id": "${XRAY_USER_UUID_REVERSE}",
         "encryption": "${XRAY_INBOUND_VLESS_ENCRYPTION_RAW}",
         "flow": "xtls-rprx-vision",
         
-        "testpre": ${XRAY_OUTBOUND_TESTPRE}  // 预连接，v25.12.8 临时功能 
+        "testpre": ${XRAY_OUTBOUND_TESTPRE},  // 预连接，v25.12.8 临时功能
+        "reverse": {
+					"tag": "r-inbound"  // 该反代的入站标签
+				}
       },
       
       "streamSettings": {

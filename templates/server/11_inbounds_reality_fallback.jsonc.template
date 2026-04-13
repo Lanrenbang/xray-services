@@ -30,13 +30,13 @@
             "${XRAY_SERVERNAME_RAW}",
             "${XRAY_SERVERNAME_XHTTP}"
           ],
-          "privateKey": "${XARY_REALITY_PRIVATEKEY}",
-          "minClientVer": "${XARY_REALITY_CLIENT_MIN}",
+          "privateKey": "${XRAY_REALITY_PRIVATEKEY}",
+          "minClientVer": "${XRAY_REALITY_CLIENT_MIN}",
           "shortIds": [
-            "${XARY_REALITY_SHORTID1}",
-            "${XARY_REALITY_SHORTID2}",
-            "${XARY_REALITY_SHORTID3}",
-            "${XARY_REALITY_SHORTID4}"
+            "${XRAY_REALITY_SHORTID1}",
+            "${XRAY_REALITY_SHORTID2}",
+            "${XRAY_REALITY_SHORTID3}",
+            "${XRAY_REALITY_SHORTID4}"
           ]
         },
         "sockopt": {

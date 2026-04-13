@@ -20,8 +20,14 @@
           "dns11.quad9.net",
           "base.dns.mullvad.net"
         ],
-        // "outboundTag": "out_xhttp_reality"
+        // "outboundTag": "out_raw_reality"
         "balancerTag": "balancer"  // 启用负载均衡器
+      },
+      {
+        "inboundTag": [ // 反向代理
+          "r-inbound"
+        ],
+        "outboundTag": "r-reverse"
       },
       {
         "inboundTag": [
@@ -37,8 +43,8 @@
       },
       { // 突发连接观测流量直连
         "domain": [
-          "connectivitycheck.gstatic.com",
-          "cp.cloudflare.com"
+          "full:connectivitycheck.gstatic.com",
+          "full:cp.cloudflare.com"
         ],
         "outboundTag": "direct"
       },
@@ -58,7 +64,7 @@
       },
       {
         "network": "tcp,udp", // 强制兜底规则，默认前面不匹配时自动走第一条出站，这里强制指定，后续不再有其他流量
-        // "outboundTag": "out_xhttp_reality"
+        // "outboundTag": "out_raw_reality"
         "balancerTag": "balancer"  // 启用负载均衡器
       }
     ],

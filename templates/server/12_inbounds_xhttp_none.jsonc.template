@@ -7,22 +7,30 @@
       "listen": "${XRAY_INBOUND_LISTEN_XHTTP_NONE_SECURITY},0666", //// listen
       "protocol": "vless",
       "settings": {
-        "clients": [ // xhttp 传输不可以使用 flow
+        "flow": "xtls-rprx-vision",  // 25.9.5，全局 flow 设置；注意：xhttp 传输本身不可以使用 flow，但如果使用 VLESS Encryption 则无底层传输限制，且 26.1.23 时将发出警告建议必须使用
+        
+        "clients": [
           {
-            "id": "${XRAY_USERS_UUID_XHTTP1}",
-            "email": "${XRAY_USERS_EMAIL_XHTTP1}"
+            "id": "${XRAY_USERS_UUID_PC}",
+            "email": "${XRAY_USERS_EMAIL_PC}"
           },
           {
-            "id": "${XRAY_USERS_UUID_XHTTP2}",
-            "email": "${XRAY_USERS_EMAIL_XHTTP2}"
+            "id": "${XRAY_USERS_UUID_IPHONE}",
+            "email": "${XRAY_USERS_EMAIL_IPHONE}"
           },
           {
-            "id": "${XRAY_USERS_UUID_XHTTP3}",
-            "email": "${XRAY_USERS_EMAIL_XHTTP3}"
+            "id": "${XRAY_USERS_UUID_ANDROID}",
+            "email": "${XRAY_USERS_EMAIL_ANDROID}"
           },
           {
-            "id": "${XRAY_USERS_UUID_XHTTP4}",
-            "email": "${XRAY_USERS_EMAIL_XHTTP4}"
+            "id": "${XRAY_USERS_UUID_NAS}",
+            "email": "${XRAY_USERS_EMAIL_NAS}"
+          },
+          {
+            "id": "${XRAY_USERS_UUID_REVERSE}",  // 反代
+            "reverse": {
+							"tag": "r-outbound"
+						}
           }
         ],
         "decryption": "${XRAY_INBOUND_VLESS_DECRYPTION_XHTTP}"
