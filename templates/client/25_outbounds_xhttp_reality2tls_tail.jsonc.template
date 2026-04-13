@@ -13,20 +13,22 @@
       "settings": {
         "address": "${XRAY_OUTBOUND_ADDRESS_XHTTP}",
         "port": ${XRAY_OUTBOUND_PORT},
-        "id": "${XRAY_USER_UUID_XHTTP}",
-        "encryption": "${XRAY_INBOUND_VLESS_ENCRYPTION_XHTTP}"
-        // xhttp 传输不可以使用 flow
+        "id": "${XRAY_USER_UUID_OUTBOUND}",
+        "encryption": "${XRAY_INBOUND_VLESS_ENCRYPTION_XHTTP}",
+        "flow": "xtls-rprx-vision",  // 注意：xhttp 传输本身不可以使用 flow，但如果使用 VLESS Encryption 则无底层传输限制，且 26.1.23 时将发出警告建议必须使用
+        
+        "testpre": ${XRAY_OUTBOUND_TESTPRE}  // 预连接，v25.12.8 临时功能 
       },
       
       "streamSettings": {
         "network": "xhttp",
         "security": "reality",
         "realitySettings": {
-          "fingerprint": "${XARY_OUTBOUND_FINGERPRINT}",
+          "fingerprint": "${XRAY_OUTBOUND_FINGERPRINT}",
           "serverName": "${XRAY_SERVERNAME_XHTTP}",
-          "password": "${XARY_REALITY_PASSWORD}",
-          "shortId": "${XARY_REALITY_SHORTID_CUR}",
-          "spiderX": "${XARY_REALITY_SPIDERX_CUR}"
+          "password": "${XRAY_REALITY_PASSWORD}",
+          "shortId": "${XRAY_REALITY_SHORTID_CUR}",
+          "spiderX": "${XRAY_REALITY_SPIDERX_CUR}"
         },
         "xhttpSettings": {
           "host": "${XRAY_OUTBOUND_ADDRESS_XHTTP}", // host > serverName > address，可省略（nginx xhttp 必须），为分享设置
@@ -39,7 +41,7 @@
               "network": "xhttp",
               "security": "tls",
               "tlsSettings": {
-                "fingerprint": "${XARY_OUTBOUND_FINGERPRINT}",
+                "fingerprint": "${XRAY_OUTBOUND_FINGERPRINT}",
                 "serverName": "${XRAY_OUTBOUND_ADDRESS_CDN}",
                 "alpn": [ // 是否能使用 h3 取决于 CDN 是否支持并且所在地区 UDP 的 QoS 是否严重}
                   "h2"
@@ -52,6 +54,9 @@
                 "mode": "auto" // 默认值，可省略，为分享设置
               },
               "sockopt": {
+                "mark": ${XRAY_OUTBOUND_MASK},  // 26.1.18 防止 TUN 接口回环，Linux 系统建议使用 mark 并配置路由，Windows 系统则使用 interface；
+                "interface": "${XRAY_OUTBOUND_INTERFACE}",
+                
                 // "acceptProxyProtocol": true,
                 // "tproxy": "off",
                 "tcpFastOpen": true,
@@ -62,6 +67,9 @@
           }
         },
         "sockopt": {
+          "mark": ${XRAY_OUTBOUND_MASK},  // 26.1.18 防止 TUN 接口回环，Linux 系统建议使用 mark 并配置路由，Windows 系统则使用 interface；
+          "interface": "${XRAY_OUTBOUND_INTERFACE}",
+          
           // "acceptProxyProtocol": true,
           // "tproxy": "off",
           "tcpFastOpen": true,

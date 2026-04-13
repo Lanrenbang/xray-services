@@ -18,6 +18,12 @@
         ],
         "outboundTag": "direct"
       },
+			{ // 反向代理
+				"inboundTag": [
+					"in_tunnel_reverse"
+				],
+				"outboundTag": "r-outbound"
+			},
       { // 广告屏蔽
         "domain": [
           "geosite:category-ads-all"

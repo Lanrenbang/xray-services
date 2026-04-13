@@ -5,6 +5,9 @@
   - 25.9.5 VLESS 加密，vleesRoute 路由分流，提升运行效率和资源占用
   - 25.9.11 简化反向代理/内网穿透
   - 25.10.15 VLESS 反向代理增强，升级 uTLS 修复 Chrome 指纹（客户端重要），http+unix://，可选简化出站配置
+  - 25.12.8 VLESS 加密临时添加 testpre/testseed 预连接 / 服务端 sockopt 添加 trustedXForwardedFor 防伪造源 IP / 默认拒绝 VLESS inbound 开了 Reverse Proxy 的 UUID 使用正向代理
+  - 26.1.18 添加 Hysteria 出站和传输（版本 2，udphop）以及 Salamander udpmask / 为 Windows 和 Linux（包括 Android）添加 TUN 入站
+  - 26.2.6 修复 XHTTP + Reality 在 mode=auto 时失败，XHTTP sessionPlacement 不支持的路径（#5638）
 
 * 出入站：
   (srv) 10_inbounds_raw_reality - vless+raw+reality，由 caddy-l4 sni 反代；

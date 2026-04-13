@@ -1,0 +1,10 @@
+{
+// 入站代理，用于接收发来的数据
+  "inbounds": [  // tunnel，由 caddy-l4 反代；
+    {
+      "tag": "in_tunnel_reverse",
+      "port": ${XRAY_INBOUND_LISTEN_TUNNLE_PORT},  // 注意 tunnel 协议不支持 unix 套接字
+      "protocol": "tunnel"
+    }
+  ]
+}

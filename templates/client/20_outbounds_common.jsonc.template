@@ -5,7 +5,13 @@
   "outbounds": [
     { // 主 outbound
       "protocol": "direct",  // 25.8.3 freedom 别名 direct
-      "tag": "direct"
+      "tag": "direct",
+      "streamSettings": {
+        "sockopt": {
+          "mark": ${XRAY_OUTBOUND_MASK},  // 26.1.18 防止 TUN 接口回环，Linux 系统建议使用 mark 并配置路由，Windows 系统则使用 interface；
+          "interface": "${XRAY_OUTBOUND_INTERFACE}"
+        }
+      }
     },
     {
       "protocol": "block",  // 25.8.3 blackhole 别名 block
